@@ -1,0 +1,32 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --bg: #f8fafc;
+  --bg-elevated: #ffffff;
+  --fg: #020617;
+  --muted: #6b7280;
+  --border-subtle: #e2e8f0;
+}
+
+.dark {
+  --bg: #020617;
+  --bg-elevated: #020617;
+  --fg: #e5e7eb;
+  --muted: #9ca3af;
+  --border-subtle: #1f2937;
+}
+
+body {
+  @apply bg-[color:var(--bg)] text-[color:var(--fg)] antialiased;
+}
+
+.card {
+  @apply rounded-xl bg-[color:var(--bg-elevated)] shadow-card border border-[color:var(--border-subtle)];
+}
+
+.layout-container {
+  @apply min-h-screen bg-[color:var(--bg)];
+}
+

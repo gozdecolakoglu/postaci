@@ -1,0 +1,25 @@
+{
+  "name": "postaci",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Modern B2B email marketing & marketing automation SaaS platform.",
+  "scripts": {
+    "dev": "concurrently \"npm run dev --workspace frontend\" \"npm run dev --workspace backend\"",
+    "dev:frontend": "npm run dev --workspace frontend",
+    "dev:backend": "npm run dev --workspace backend",
+    "build": "npm run build --workspace frontend && npm run build --workspace backend",
+    "lint": "npm run lint --workspace frontend",
+    "db:migrate": "npm run db:migrate --workspace backend",
+    "db:push": "npm run db:push --workspace backend",
+    "format": "prettier --write ."
+  },
+  "workspaces": [
+    "frontend",
+    "backend"
+  ],
+  "devDependencies": {
+    "concurrently": "^9.0.0",
+    "prettier": "^3.3.3"
+  }
+}
+

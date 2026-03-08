@@ -1,0 +1,317 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum UserRole {
+  OWNER
+  ADMIN
+  EDITOR
+  VIEWER
+}
+
+enum ContactStatus {
+  ACTIVE
+  UNSUBSCRIBED
+  BOUNCED
+}
+
+enum ConsentType {
+  SUBSCRIBED
+  UNSUBSCRIBED
+  GDPR_EXPORT
+  GDPR_DELETE
+}
+
+enum CampaignStatus {
+  DRAFT
+  SCHEDULED
+  SENDING
+  SENT
+  CANCELLED
+}
+
+enum TemplateType {
+  CAMPAIGN
+  AUTOMATION
+  TRANSACTIONAL
+}
+
+enum EmailEventType {
+  SENT
+  DELIVERED
+  OPENED
+  CLICKED
+  BOUNCED
+  SPAM
+  UNSUBSCRIBED
+}
+
+enum WorkflowStatus {
+  DRAFT
+  ACTIVE
+  PAUSED
+}
+
+enum NodeType {
+  TRIGGER
+  CONDITION
+  EMAIL
+  DELAY
+  SPLIT
+}
+
+enum SubscriptionStatus {
+  TRIAL
+  ACTIVE
+  PAST_DUE
+  CANCELED
+}
+
+enum WebhookStatus {
+  ACTIVE
+  DISABLED
+}
+
+model User {
+  id               String    @id @default(uuid())
+  email            String    @unique
+  passwordHash     String
+  fullName         String
+  isEmailVerified  Boolean   @default(false)
+  twoFactorEnabled Boolean   @default(false)
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+
+  memberships Membership[]
+}
+
+model Organization {
+  id          String       @id @default(uuid())
+  name        String
+  slug        String       @unique
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+
+  members      Membership[]
+  contacts     Contact[]
+  lists        List[]
+  tags         Tag[]
+  campaigns    Campaign[]
+  templates    EmailTemplate[]
+  workflows    AutomationWorkflow[]
+  apiKeys      ApiKey[]
+  webhooks     Webhook[]
+  subscriptions Subscription[]
+}
+
+model Membership {
+  id             String     @id @default(uuid())
+  userId         String
+  organizationId String
+  role           UserRole
+
+  user         User         @relation(fields: [userId], references: [id])
+  organization Organization @relation(fields: [organizationId], references: [id])
+
+  @@unique([userId, organizationId])
+}
+
+model Contact {
+  id             String         @id @default(uuid())
+  organizationId String
+  email          String
+  firstName      String?
+  lastName       String?
+  status         ContactStatus  @default(ACTIVE)
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+
+  organization   Organization   @relation(fields: [organizationId], references: [id])
+  lists          ContactList[]
+  tags           ContactTag[]
+  consentEvents  ConsentEvent[]
+  events         CampaignEmailEvent[]
+
+  @@unique([organizationId, email])
+}
+
+model List {
+  id             String        @id @default(uuid())
+  organizationId String
+  name           String
+  description    String?
+  createdAt      DateTime      @default(now())
+
+  organization Organization @relation(fields: [organizationId], references: [id])
+  contacts     ContactList[]
+}
+
+model ContactList {
+  contactId String
+  listId    String
+
+  contact Contact @relation(fields: [contactId], references: [id])
+  list    List    @relation(fields: [listId], references: [id])
+
+  @@id([contactId, listId])
+}
+
+model Tag {
+  id             String       @id @default(uuid())
+  organizationId String
+  name           String
+  color          String?
+
+  organization Organization @relation(fields: [organizationId], references: [id])
+  contacts     ContactTag[]
+
+  @@unique([organizationId, name])
+}
+
+model ContactTag {
+  contactId String
+  tagId     String
+
+  contact Contact @relation(fields: [contactId], references: [id])
+  tag     Tag     @relation(fields: [tagId], references: [id])
+
+  @@id([contactId, tagId])
+}
+
+model ConsentEvent {
+  id        String      @id @default(uuid())
+  contactId String
+  type      ConsentType
+  ip        String?
+  userAgent String?
+  meta      Json?
+  createdAt DateTime    @default(now())
+
+  contact Contact @relation(fields: [contactId], references: [id])
+}
+
+model EmailTemplate {
+  id             String       @id @default(uuid())
+  organizationId String
+  name           String
+  type           TemplateType
+  subject        String
+  fromName       String
+  fromEmail      String
+  html           String
+  design         Json?
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+
+  organization Organization @relation(fields: [organizationId], references: [id])
+  campaigns    Campaign[]
+}
+
+model Campaign {
+  id             String         @id @default(uuid())
+  organizationId String
+  templateId     String?
+  name           String
+  subject        String
+  status         CampaignStatus @default(DRAFT)
+  fromName       String
+  fromEmail      String
+  sendAt         DateTime?
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+
+  organization Organization  @relation(fields: [organizationId], references: [id])
+  template     EmailTemplate @relation(fields: [templateId], references: [id])
+  events       CampaignEmailEvent[]
+}
+
+model CampaignEmailEvent {
+  id         String         @id @default(uuid())
+  campaignId String
+  contactId  String
+  type       EmailEventType
+  occuredAt  DateTime       @default(now())
+  meta       Json?
+
+  campaign Campaign @relation(fields: [campaignId], references: [id])
+  contact  Contact  @relation(fields: [contactId], references: [id])
+
+  @@index([campaignId, type])
+}
+
+model AutomationWorkflow {
+  id             String         @id @default(uuid())
+  organizationId String
+  name           String
+  status         WorkflowStatus @default(DRAFT)
+  trigger        Json
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+
+  organization Organization  @relation(fields: [organizationId], references: [id])
+  nodes        AutomationNode[]
+}
+
+model AutomationNode {
+  id          String    @id @default(uuid())
+  workflowId  String
+  type        NodeType
+  config      Json
+  positionX   Int
+  positionY   Int
+  nextNodeIds String[]
+
+  workflow AutomationWorkflow @relation(fields: [workflowId], references: [id])
+}
+
+model SubscriptionPlan {
+  id             String   @id @default(uuid())
+  name           String
+  code           String   @unique
+  priceMonthly   Int
+  emailsPerMonth Int
+  contactsLimit  Int?
+  isRecommended  Boolean  @default(false)
+  features       String[]
+}
+
+model Subscription {
+  id             String             @id @default(uuid())
+  organizationId String
+  planId         String
+  status         SubscriptionStatus @default(TRIAL)
+  currentPeriodEnd DateTime
+  cancelAtPeriodEnd Boolean @default(false)
+
+  organization Organization   @relation(fields: [organizationId], references: [id])
+  plan         SubscriptionPlan @relation(fields: [planId], references: [id])
+}
+
+model ApiKey {
+  id             String   @id @default(uuid())
+  organizationId String
+  name           String
+  keyHash        String
+  isActive       Boolean  @default(true)
+  lastUsedAt     DateTime?
+  createdAt      DateTime @default(now())
+
+  organization Organization @relation(fields: [organizationId], references: [id])
+}
+
+model Webhook {
+  id             String        @id @default(uuid())
+  organizationId String
+  url            String
+  events         String[]
+  status         WebhookStatus @default(ACTIVE)
+  lastDeliveryAt DateTime?
+
+  organization Organization @relation(fields: [organizationId], references: [id])
+}
+
