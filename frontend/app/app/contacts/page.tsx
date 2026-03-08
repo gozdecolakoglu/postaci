@@ -1,96 +1,26 @@
-"use client";
-
-import { useEffect, useState } from "react";
 import { Button } from "@/components/atoms/Button";
 import { Input } from "@/components/atoms/Input";
 import { Badge } from "@/components/atoms/Badge";
 import { Table } from "@/components/molecules/Table";
-import { Modal } from "@/components/molecules/Modal";
-import { apiGet, apiPost } from "@/lib/api";
-import { useToast } from "@/components/feedback/ToastProvider";
 
-interface ContactRow {
-  id: string;
-  email: string;
-  firstName?: string | null;
-  lastName?: string | null;
-  status: string;
-}
+const contacts = [
+  {
+    name: "Ayşe Kara",
+    email: "ayse.kara@kurumsal.com",
+    company: "Beta Ajans",
+    status: "Aktif",
+    tags: ["ABM", "Finance"],
+  },
+  {
+    name: "Mehmet Demir",
+    email: "mehmet.demir@holding.com",
+    company: "Delta Holding",
+    status: "Aktif",
+    tags: ["Enterprise"],
+  },
+];
 
 export default function ContactsPage() {
-  const { push } = useToast();
-  const [contacts, setContacts] = useState<ContactRow[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [modalOpen, setModalOpen] = useState(false);
-  const [firstName, setFirstName] = useState("");
-  const [lastName, setLastName] = useState("");
-  const [email, setEmail] = useState("");
-
-  useEffect(() => {
-    const load = async () => {
-      try {
-        const data = await apiGet<ContactRow[]>("/contacts");
-        setContacts(data);
-      } catch (error) {
-        console.error(error);
-        push({
-          variant: "error",
-          title: "Kişiler yüklenemedi",
-          description: "Şimdilik örnek veriler gösteriliyor.",
-        });
-        setContacts([
-          {
-            id: "1",
-            email: "ayse.kara@kurumsal.com",
-            firstName: "Ayşe",
-            lastName: "Kara",
-            status: "ACTIVE",
-          },
-        ]);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    void load();
-  }, [push]);
-
-  const handleCreate = async () => {
-    if (!email) {
-      push({
-        variant: "error",
-        title: "Email zorunlu",
-        description: "Yeni kişi eklemek için en az email adresi girmelisin.",
-      });
-      return;
-    }
-
-    try {
-      const created = await apiPost<ContactRow>("/contacts", {
-        email,
-        firstName,
-        lastName,
-      });
-      setContacts((prev) => [created, ...prev]);
-      setModalOpen(false);
-      setFirstName("");
-      setLastName("");
-      setEmail("");
-      push({
-        variant: "success",
-        title: "Kişi eklendi",
-        description: "Yeni kişi başarıyla listeye eklendi.",
-      });
-    } catch (error) {
-      console.error(error);
-      push({
-        variant: "error",
-        title: "Kişi eklenemedi",
-        description: "Lütfen daha sonra tekrar dene.",
-      });
-    }
-  };
-
   return (
     <div className="space-y-6">
       <div className="flex flex-wrap items-center justify-between gap-3">
@@ -102,7 +32,7 @@ export default function ContactsPage() {
         </div>
         <div className="flex flex-wrap items-center gap-2">
           <Button variant="secondary">CSV import</Button>
-          <Button onClick={() => setModalOpen(true)}>Yeni kişi ekle</Button>
+          <Button>Yeni kişi ekle</Button>
         </div>
       </div>
 
@@ -125,69 +55,48 @@ export default function ContactsPage() {
           {
             id: "name",
             header: "Kişi",
-            accessor: (row) => {
-              const c = row as ContactRow;
-              const fullName =
-                [c.firstName, c.lastName].filter(Boolean).join(" ") || "İsimsiz kişi";
-              return (
-                <div>
-                  <p className="text-sm font-medium text-[color:var(--fg)]">
-                    {fullName}
-                  </p>
-                  <p className="text-[11px] text-[color:var(--muted)]">{c.email}</p>
-                </div>
-              );
-            },
+            accessor: (row) => (
+              <div>
+                <p className="text-sm font-medium text-[color:var(--fg)]">
+                  {(row as (typeof contacts)[number]).name}
+                </p>
+                <p className="text-[11px] text-[color:var(--muted)]">
+                  {(row as (typeof contacts)[number]).email}
+                </p>
+              </div>
+            ),
+          },
+          {
+            id: "company",
+            header: "Şirket",
+            accessor: (row) => (row as (typeof contacts)[number]).company,
+          },
+          {
+            id: "tags",
+            header: "Tagler",
+            accessor: (row) => (
+              <div className="flex flex-wrap gap-1">
+                {(row as (typeof contacts)[number]).tags.map((tag) => (
+                  <Badge key={tag} variant="outline">
+                    {tag}
+                  </Badge>
+                ))}
+              </div>
+            ),
           },
           {
             id: "status",
             header: "Durum",
-            accessor: (row) => {
-              const c = row as ContactRow;
-              const label =
-                c.status === "ACTIVE"
-                  ? "Aktif"
-                  : c.status === "UNSUBSCRIBED"
-                  ? "Unsubscribed"
-                  : "Bounced";
-              return <Badge variant="success">{label}</Badge>;
-            },
+            accessor: (row) => (
+              <Badge variant="success">
+                {(row as (typeof contacts)[number]).status}
+              </Badge>
+            ),
           },
         ]}
         data={contacts}
-        emptyMessage={loading ? "Yükleniyor..." : "Henüz kişi eklenmedi."}
+        emptyMessage="Henüz kişi eklenmedi."
       />
-
-      <Modal
-        open={modalOpen}
-        onClose={() => setModalOpen(false)}
-        title="Yeni kişi ekle"
-        description="Email adresi zorunludur, diğer bilgiler opsiyoneldir."
-        primaryAction={{
-          label: "Kişiyi oluştur",
-          onClick: handleCreate,
-        }}
-      >
-        <div className="space-y-3">
-          <Input
-            label="Ad"
-            value={firstName}
-            onChange={(e) => setFirstName(e.target.value)}
-          />
-          <Input
-            label="Soyad"
-            value={lastName}
-            onChange={(e) => setLastName(e.target.value)}
-          />
-          <Input
-            label="Email"
-            type="email"
-            required
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-          />
-        </div>
-      </Modal>
     </div>
   );
 }
