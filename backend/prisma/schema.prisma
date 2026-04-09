@@ -4,7 +4,7 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
+  provider = "mongodb"
   url      = env("DATABASE_URL")
 }
 
@@ -79,7 +79,7 @@ enum WebhookStatus {
 }
 
 model User {
-  id               String    @id @default(uuid())
+  id               String @id @default(auto()) @map("_id") @db.ObjectId
   email            String    @unique
   passwordHash     String
   fullName         String
@@ -92,7 +92,7 @@ model User {
 }
 
 model Organization {
-  id          String       @id @default(uuid())
+  id          String       @id @default(auto()) @map("_id") @db.ObjectId
   name        String
   slug        String       @unique
   createdAt   DateTime     @default(now())
@@ -111,9 +111,9 @@ model Organization {
 }
 
 model Membership {
-  id             String     @id @default(uuid())
-  userId         String
-  organizationId String
+  id             String     @id @default(auto()) @map("_id") @db.ObjectId
+  userId         String @db.ObjectId
+  organizationId String @db.ObjectId
   role           UserRole
 
   user         User         @relation(fields: [userId], references: [id])
@@ -123,8 +123,8 @@ model Membership {
 }
 
 model Contact {
-  id             String         @id @default(uuid())
-  organizationId String
+  id             String         @id @default(auto()) @map("_id") @db.ObjectId
+  organizationId String @db.ObjectId
   email          String
   firstName      String?
   lastName       String?
@@ -142,8 +142,8 @@ model Contact {
 }
 
 model List {
-  id             String        @id @default(uuid())
-  organizationId String
+  id             String        @id @default(auto()) @map("_id") @db.ObjectId
+  organizationId String @db.ObjectId
   name           String
   description    String?
   createdAt      DateTime      @default(now())
@@ -153,18 +153,19 @@ model List {
 }
 
 model ContactList {
-  contactId String
-  listId    String
+  id        String @id @default(auto()) @map("_id") @db.ObjectId
+  contactId String @db.ObjectId
+  listId    String @db.ObjectId
 
   contact Contact @relation(fields: [contactId], references: [id])
   list    List    @relation(fields: [listId], references: [id])
 
-  @@id([contactId, listId])
+  @@unique([contactId, listId])
 }
 
 model Tag {
-  id             String       @id @default(uuid())
-  organizationId String
+  id             String       @id @default(auto()) @map("_id") @db.ObjectId
+  organizationId String @db.ObjectId
   name           String
   color          String?
 
@@ -175,18 +176,19 @@ model Tag {
 }
 
 model ContactTag {
-  contactId String
-  tagId     String
+  id        String @id @default(auto()) @map("_id") @db.ObjectId
+  contactId String @db.ObjectId
+  tagId     String @db.ObjectId
 
   contact Contact @relation(fields: [contactId], references: [id])
   tag     Tag     @relation(fields: [tagId], references: [id])
 
-  @@id([contactId, tagId])
+  @@unique([contactId, tagId])
 }
 
 model ConsentEvent {
-  id        String      @id @default(uuid())
-  contactId String
+  id        String      @id @default(auto()) @map("_id") @db.ObjectId
+  contactId String @db.ObjectId
   type      ConsentType
   ip        String?
   userAgent String?
@@ -197,8 +199,8 @@ model ConsentEvent {
 }
 
 model EmailTemplate {
-  id             String       @id @default(uuid())
-  organizationId String
+  id             String       @id @default(auto()) @map("_id") @db.ObjectId
+  organizationId String @db.ObjectId
   name           String
   type           TemplateType
   subject        String
@@ -214,9 +216,9 @@ model EmailTemplate {
 }
 
 model Campaign {
-  id             String         @id @default(uuid())
-  organizationId String
-  templateId     String?
+  id             String         @id @default(auto()) @map("_id") @db.ObjectId
+  organizationId String @db.ObjectId
+  templateId     String? @db.ObjectId
   name           String
   subject        String
   status         CampaignStatus @default(DRAFT)
@@ -227,14 +229,14 @@ model Campaign {
   updatedAt      DateTime       @updatedAt
 
   organization Organization  @relation(fields: [organizationId], references: [id])
-  template     EmailTemplate @relation(fields: [templateId], references: [id])
+  template     EmailTemplate? @relation(fields: [templateId], references: [id])
   events       CampaignEmailEvent[]
 }
 
 model CampaignEmailEvent {
-  id         String         @id @default(uuid())
-  campaignId String
-  contactId  String
+  id         String         @id @default(auto()) @map("_id") @db.ObjectId
+  campaignId String @db.ObjectId
+  contactId  String @db.ObjectId
   type       EmailEventType
   occuredAt  DateTime       @default(now())
   meta       Json?
@@ -246,8 +248,8 @@ model CampaignEmailEvent {
 }
 
 model AutomationWorkflow {
-  id             String         @id @default(uuid())
-  organizationId String
+  id             String         @id @default(auto()) @map("_id") @db.ObjectId
+  organizationId String @db.ObjectId
   name           String
   status         WorkflowStatus @default(DRAFT)
   trigger        Json
@@ -259,8 +261,8 @@ model AutomationWorkflow {
 }
 
 model AutomationNode {
-  id          String    @id @default(uuid())
-  workflowId  String
+  id          String @id @default(auto()) @map("_id") @db.ObjectId
+  workflowId  String @db.ObjectId
   type        NodeType
   config      Json
   positionX   Int
@@ -271,7 +273,7 @@ model AutomationNode {
 }
 
 model SubscriptionPlan {
-  id             String   @id @default(uuid())
+  id             String   @id @default(auto()) @map("_id") @db.ObjectId
   name           String
   code           String   @unique
   priceMonthly   Int
@@ -279,12 +281,13 @@ model SubscriptionPlan {
   contactsLimit  Int?
   isRecommended  Boolean  @default(false)
   features       String[]
+  subscriptions  Subscription[]
 }
 
 model Subscription {
-  id             String             @id @default(uuid())
-  organizationId String
-  planId         String
+  id             String             @id @default(auto()) @map("_id") @db.ObjectId
+  organizationId String @db.ObjectId
+  planId         String @db.ObjectId
   status         SubscriptionStatus @default(TRIAL)
   currentPeriodEnd DateTime
   cancelAtPeriodEnd Boolean @default(false)
@@ -294,8 +297,8 @@ model Subscription {
 }
 
 model ApiKey {
-  id             String   @id @default(uuid())
-  organizationId String
+  id             String   @id @default(auto()) @map("_id") @db.ObjectId
+  organizationId String @db.ObjectId
   name           String
   keyHash        String
   isActive       Boolean  @default(true)
@@ -306,8 +309,8 @@ model ApiKey {
 }
 
 model Webhook {
-  id             String        @id @default(uuid())
-  organizationId String
+  id             String        @id @default(auto()) @map("_id") @db.ObjectId
+  organizationId String @db.ObjectId
   url            String
   events         String[]
   status         WebhookStatus @default(ACTIVE)

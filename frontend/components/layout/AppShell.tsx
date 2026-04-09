@@ -72,11 +72,10 @@ export function AppShell({ children }: AppShellProps) {
                   <li key={item.href}>
                     <Link
                       href={item.href}
-                      className={`flex items-center gap-2 rounded-xl px-2.5 py-2 text-sm transition ${
-                        active
+                      className={`flex items-center gap-2 rounded-xl px-2.5 py-2 text-sm transition ${active
                           ? "bg-primary-50 text-primary-700 dark:bg-slate-900 dark:text-primary-300"
                           : "text-[color:var(--muted)] hover:bg-slate-100 dark:hover:bg-slate-900"
-                      }`}
+                        }`}
                     >
                       <Icon className="h-4 w-4" />
                       <span>{item.label}</span>
@@ -98,11 +97,10 @@ export function AppShell({ children }: AppShellProps) {
                   <li key={item.href}>
                     <Link
                       href={item.href}
-                      className={`flex items-center gap-2 rounded-xl px-2.5 py-2 text-sm transition ${
-                        active
+                      className={`flex items-center gap-2 rounded-xl px-2.5 py-2 text-sm transition ${active
                           ? "bg-primary-50 text-primary-700 dark:bg-slate-900 dark:text-primary-300"
                           : "text-[color:var(--muted)] hover:bg-slate-100 dark:hover:bg-slate-900"
-                      }`}
+                        }`}
                     >
                       <Icon className="h-4 w-4" />
                       <span>{item.label}</span>
@@ -148,7 +146,7 @@ export function AppShell({ children }: AppShellProps) {
               Email Marketing & Automation
             </p>
             <p className="text-sm text-[color:var(--muted)]">
-              B2B ekipler için performans odaklı posta stüdyosu
+              Ekipler için performans odaklı posta stüdyosu
             </p>
           </div>
           <div className="flex items-center gap-3">

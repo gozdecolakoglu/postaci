@@ -6,7 +6,7 @@ import { ToastProvider } from "@/components/feedback/ToastProvider";
 export const metadata = {
   title: "PostaCI – Email Marketing & Automation",
   description:
-    "Modern B2B ekipler için email marketing & marketing automation platformu.",
+    "Ekipler için email marketing & marketing automation platformu.",
 };
 
 export default function RootLayout({ children }: { children: ReactNode }) {

@@ -30,7 +30,11 @@ export function errorHandler(
     return res.status(err.status).json({ error: err.message });
   }
 
-  console.error(err);
-  return res.status(500).json({ error: "Internal Server Error" });
-}
-
+  console.error("Error caught by global handler:", err);
+  const message = err instanceof Error ? err.message : "Internal Server Error";
+  
+  return res.status(500).json({ 
+    error: message,
+    stack: process.env.NODE_ENV === "development" ? (err as any).stack : undefined
+  });
+};

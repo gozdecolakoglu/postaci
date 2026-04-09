@@ -10,15 +10,41 @@ export default function RegisterPage() {
   const router = useRouter();
   const { push } = useToast();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    push({
-      variant: "success",
-      title: "Hesap oluşturuldu",
-      description:
-        "Demo ortamında mail doğrulaması atlanarak doğrudan dashboard ekranına yönlendiriliyorsun.",
-    });
-    router.push("/app/dashboard");
+    const formData = new FormData(e.target as HTMLFormElement);
+    const data = Object.fromEntries(formData.entries());
+
+    try {
+      const response = await fetch("/api/auth/register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+      });
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        throw new Error(result.message || "Kayıt sırasında bir hata oluştu");
+      }
+
+      // Token'i sakla (Basit demo için localStorage, gerçek projede cookie önerilir)
+      localStorage.setItem("token", result.token);
+
+      push({
+        variant: "success",
+        title: "Hesap oluşturuldu",
+        description: "Dashboard ekranına yönlendiriliyorsun.",
+      });
+
+      router.push("/app/dashboard");
+    } catch (error: any) {
+      push({
+        variant: "error",
+        title: "Kayıt Başarısız",
+        description: error.message,
+      });
+    }
   };
 
   return (

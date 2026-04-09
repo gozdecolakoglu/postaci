@@ -22,7 +22,7 @@ export default function AuthLayout({ children }: { children: ReactNode }) {
             </div>
             <div className="mt-8 space-y-3">
               <h1 className="text-2xl font-semibold tracking-tight">
-                B2B ekipler için premium email stüdyosu
+                Ekipler için premium email stüdyosu
               </h1>
               <p className="text-sm text-[color:var(--muted)]">
                 Hesap bazlı pazarlama, otomasyon ve detaylı raporlama için modern bir

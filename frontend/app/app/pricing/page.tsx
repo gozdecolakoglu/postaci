@@ -25,7 +25,7 @@ const plans = [
     name: "Pro",
     price: "1.890₺",
     period: "/ay",
-    description: "ABM odaklı B2B ekipler",
+    description: "ABM odaklı ekipler",
     highlight: true,
     features: [
       "50.000 email / ay",
@@ -54,7 +54,7 @@ export default function PricingPage() {
           Şeffaf ve ölçeklenebilir fiyatlandırma
         </h1>
         <p className="text-sm text-[color:var(--muted)] max-w-xl mx-auto">
-          Her boyuttan B2B ekip için esnek paketler. Kullanıma göre ölçeklen,
+          Her boyuttan ekip için esnek paketler. Kullanıma göre ölçeklen,
           gereksiz karmaşaya takılma.
         </p>
       </div>
@@ -63,9 +63,8 @@ export default function PricingPage() {
         {plans.map((plan) => (
           <div
             key={plan.name}
-            className={`card flex flex-col p-4 text-sm ${
-              plan.highlight ? "border-primary-200 shadow-card" : ""
-            }`}
+            className={`card flex flex-col p-4 text-sm ${plan.highlight ? "border-primary-200 shadow-card" : ""
+              }`}
           >
             <div className="flex items-center justify-between">
               <p className="text-xs text-[color:var(--muted)]">{plan.description}</p>

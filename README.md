@@ -1,7 +1,7 @@
 PostaCI - Email Marketing & Automation Platform
 ===============================================
 
-This repository contains a full‑stack SaaS application for a modern, B2B‑focused **Email Marketing & Marketing Automation Platform**, similar to Mailchimp but with a cleaner, minimal UI and opinionated workflows.
+This repository contains a full‑stack SaaS application for a modern‑focused **Email Marketing & Marketing Automation Platform**, similar to Mailchimp but with a cleaner, minimal UI and opinionated workflows.
 
 ### Tech Stack
 

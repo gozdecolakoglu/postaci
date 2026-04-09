@@ -1,8 +1,8 @@
+import { config } from "dotenv";
+config();
+
 import { createServer } from "http";
 import { app } from "./server";
-import { config } from "dotenv";
-
-config();
 
 const PORT = process.env.PORT || 4000;
 

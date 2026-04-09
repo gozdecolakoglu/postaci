@@ -126,7 +126,7 @@ export default function DashboardPage() {
                     {(row as (typeof lastCampaigns)[number]).name}
                   </p>
                   <p className="text-[11px] text-[color:var(--muted)]">
-                    B2B aktivasyon • 14 Şubat 2026
+                    aktivasyon • 14 Şubat 2026
                   </p>
                 </div>
               ),

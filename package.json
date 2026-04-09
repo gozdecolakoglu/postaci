@@ -2,7 +2,7 @@
   "name": "postaci",
   "private": true,
   "version": "0.1.0",
-  "description": "Modern B2B email marketing & marketing automation SaaS platform.",
+  "description": "Modern email marketing & marketing automation SaaS platform.",
   "engines": {
     "node": "20.x"
   },
@@ -27,4 +27,3 @@
     "prisma": "^5.20.0"
   }
 }
-

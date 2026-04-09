@@ -11,6 +11,8 @@ export const router = Router();
 const authSchema = z.object({
   email: z.string().email(),
   password: z.string().min(8),
+  fullName: z.string().optional(),
+  organizationName: z.string().optional(),
 });
 
 router.post(
@@ -30,13 +32,13 @@ router.post(
       data: {
         email: data.email,
         passwordHash,
-        fullName: data.email.split("@")[0],
+        fullName: data.fullName || data.email.split("@")[0],
         memberships: {
           create: {
             role: "OWNER",
             organization: {
               create: {
-                name: "New Organization",
+                name: data.organizationName || "New Organization",
                 slug: `org-${Date.now()}`,
               },
             },
