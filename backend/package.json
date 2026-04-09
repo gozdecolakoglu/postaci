@@ -4,7 +4,7 @@
   "private": true,
   "main": "dist/index.js",
   "engines": {
-    "node": ">=18.0.0"
+    "node": "20.x"
   },
   "scripts": {
     "dev": "ts-node-dev --respawn --transpile-only src/index.ts",
@@ -12,7 +12,7 @@
     "start": "node dist/index.js",
     "db:migrate": "prisma migrate dev",
     "db:push": "prisma db push",
-    "db:generate": "prisma generate",
+    "db:generate": "npx prisma generate",
     "lint": "echo \"No backend linter configured yet\""
   },
   "dependencies": {

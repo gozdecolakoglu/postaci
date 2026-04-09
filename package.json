@@ -3,6 +3,9 @@
   "private": true,
   "version": "0.1.0",
   "description": "Modern B2B email marketing & marketing automation SaaS platform.",
+  "engines": {
+    "node": "20.x"
+  },
   "scripts": {
     "dev": "concurrently \"npm run dev --workspace frontend\" \"npm run dev --workspace backend\"",
     "dev:frontend": "npm run dev --workspace frontend",
@@ -12,7 +15,7 @@
     "db:migrate": "npm run db:migrate --workspace backend",
     "db:push": "npm run db:push --workspace backend",
     "format": "prettier --write .",
-    "postinstall": "npm run db:generate --workspace backend"
+    "postinstall": "npx prisma generate --schema=./backend/prisma/schema.prisma"
   },
   "workspaces": [
     "frontend",
@@ -20,7 +23,8 @@
   ],
   "devDependencies": {
     "concurrently": "^9.0.0",
-    "prettier": "^3.3.3"
+    "prettier": "^3.3.3",
+    "prisma": "^5.20.0"
   }
 }
 
